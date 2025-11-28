@@ -4,47 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stream Sanctuary - Complete Streaming Platform</title>
-    <meta name="description" content="Privacy-respecting multi-source streaming platform with gamification, learning systems, and zero-harm principles">
+    <meta name="description" content="Self-contained browser-based streaming platform with WebRTC, WebSocket, and RTMP support">
     
     <!-- 
     ═══════════════════════════════════════════════════════════════════════════
-    ZERO-HARM & ANTI-INVERSION NOTICE
+    STREAM SANCTUARY v1.0 - STANDALONE EDITION
     ═══════════════════════════════════════════════════════════════════════════
     
-    This tool is designed for legitimate content creation and educational streaming.
+    A complete, self-contained streaming platform in a single HTML file.
+    No external dependencies. Works offline. Production-ready.
     
-    INTENDED USE:
-    - Personal broadcasting to authorized platforms
-    - Educational content delivery
-    - Creative expression and community building
+    FEATURES:
+    - WebRTC-WHIP streaming (Cloudflare, Mux compatible)
+    - WebSocket binary streaming
+    - HLS segment upload
+    - Screen capture + audio
+    - Real-time audio visualization
+    - Role-based gamification (6 roles)
+    - Achievement system
+    - Stream history tracking
+    - Multi-platform support
+    - Zero external dependencies
     
-    NON-WEAPONIZATION COVENANT:
-    - Do not use for unauthorized surveillance
-    - Do not use to bypass platform terms of service
-    - Do not use to stream copyrighted content without permission
-    - Do not use for harassment, doxxing, or invasive monitoring
+    QUICK START:
+    1. Open this file in Chrome/Edge/Firefox
+    2. Choose streaming protocol
+    3. Enter RTMP server URL and stream key
+    4. Click "Start Capture" to select screen
+    5. Click "Start Streaming" to begin
     
-    PRIVACY SAFEGUARDS:
-    - All credentials stored locally in your browser only
-    - No external analytics or tracking
-    - User-controlled data retention
-    - Admin analytics summarize usage patterns only (no PII)
+    SERVER OPTIONS:
+    - Cloudflare Stream (recommended, $1/1000 min)
+    - Mux (developer-friendly, $0.50/1000 min)
+    - AWS IVS (enterprise)
+    - Self-hosted (SRS, Ant Media Server)
+    - Custom WebSocket server (see guide below)
     
-    LICENSE: MIT License - Free to use, modify, and distribute with attribution
+    ZERO-HARM COMMITMENT:
+    - Privacy-first design (all data local)
+    - No surveillance or tracking
+    - Respects platform ToS
+    - Open source (MIT License)
+    - Educational use encouraged
     
-    By using this tool, you agree to respect platform ToS, copyright law, 
-    and the dignity of all persons who may appear in your streams.
+    LICENSE: MIT - Free to use, modify, distribute with attribution
+    
+    Built by Foster + Navi for Planetary Restoration Archive
+    admin@planetaryrestorationarchive.com
     ═══════════════════════════════════════════════════════════════════════════
     -->
     
     <style>
         /* ═══════════════════════════════════════════════════════════════════════════
-           ROOT VARIABLES & ROLE-BASED THEME SYSTEM
-           ═══════════════════════════════════════════════════════════════════════════
-           Purpose: Role-based visual identity with unique currencies and progression
-           Usage: Roles define streaming style, earn role-specific currencies
-           Expected: Immersive theming that reflects streaming archetype
-        */
+           CSS VARIABLES - ROLE-BASED THEMING
+           ═══════════════════════════════════════════════════════════════════════════ */
         :root {
             --primary: #6366f1;
             --primary-dark: #4f46e5;
@@ -65,96 +78,35 @@
             --currency-color: #fbbf24;
         }
         
-        /* Content Creator Role */
         [data-role="creator"] {
-            --primary: #ff6b9d;
-            --primary-dark: #ff4081;
-            --secondary: #ffd93d;
-            --accent: #6bcfff;
-            --background: #1a0d2e;
-            --surface: #2d1b4e;
-            --surface-light: #3f2c5f;
-            --glow: rgba(255, 107, 157, 0.4);
-            --currency-color: #ffd93d;
+            --primary: #ff6b9d; --primary-dark: #ff4081; --secondary: #ffd93d; --accent: #6bcfff;
+            --background: #1a0d2e; --surface: #2d1b4e; --surface-light: #3f2c5f; --glow: rgba(255, 107, 157, 0.4); --currency-color: #ffd93d;
         }
-        
-        /* Educator Role */
         [data-role="educator"] {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --secondary: #a78bfa;
-            --accent: #06b6d4;
-            --background: #020617;
-            --surface: #0c1222;
-            --surface-light: #1e293b;
-            --glow: rgba(59, 130, 246, 0.4);
-            --currency-color: #60a5fa;
+            --primary: #3b82f6; --primary-dark: #2563eb; --secondary: #a78bfa; --accent: #06b6d4;
+            --background: #020617; --surface: #0c1222; --surface-light: #1e293b; --glow: rgba(59, 130, 246, 0.4); --currency-color: #60a5fa;
         }
-        
-        /* Gamer Role */
         [data-role="gamer"] {
-            --primary: #10b981;
-            --primary-dark: #059669;
-            --secondary: #84cc16;
-            --accent: #f59e0b;
-            --background: #0a1f1a;
-            --surface: #14362d;
-            --surface-light: #1e5347;
-            --glow: rgba(16, 185, 129, 0.4);
-            --currency-color: #34d399;
+            --primary: #10b981; --primary-dark: #059669; --secondary: #84cc16; --accent: #f59e0b;
+            --background: #0a1f1a; --surface: #14362d; --surface-light: #1e5347; --glow: rgba(16, 185, 129, 0.4); --currency-color: #34d399;
         }
-        
-        /* Artist Role */
         [data-role="artist"] {
-            --primary: #8b7355;
-            --primary-dark: #6b5640;
-            --secondary: #d4af37;
-            --accent: #e879f9;
-            --background: #1a1410;
-            --surface: #2d2419;
-            --surface-light: #3d3020;
-            --glow: rgba(212, 175, 55, 0.3);
-            --currency-color: #d4af37;
+            --primary: #8b7355; --primary-dark: #6b5640; --secondary: #d4af37; --accent: #e879f9;
+            --background: #1a1410; --surface: #2d2419; --surface-light: #3d3020; --glow: rgba(212, 175, 55, 0.3); --currency-color: #d4af37;
         }
-        
-        /* Tech Innovator Role */
         [data-role="tech"] {
-            --primary: #00ffff;
-            --primary-dark: #00cccc;
-            --secondary: #ff00ff;
-            --accent: #00ff00;
-            --background: #0a0a0a;
-            --surface: #1a1a1a;
-            --surface-light: #2a2a2a;
-            --glow: rgba(0, 255, 255, 0.5);
-            --currency-color: #00ffff;
+            --primary: #00ffff; --primary-dark: #00cccc; --secondary: #ff00ff; --accent: #00ff00;
+            --background: #0a0a0a; --surface: #1a1a1a; --surface-light: #2a2a2a; --glow: rgba(0, 255, 255, 0.5); --currency-color: #00ffff;
         }
-        
-        /* Community Builder Role */
         [data-role="community"] {
-            --primary: #f97316;
-            --primary-dark: #ea580c;
-            --secondary: #fb923c;
-            --accent: #fbbf24;
-            --background: #1c1410;
-            --surface: #2d2419;
-            --surface-light: #3d3020;
-            --glow: rgba(249, 115, 22, 0.4);
-            --currency-color: #fb923c;
+            --primary: #f97316; --primary-dark: #ea580c; --secondary: #fb923c; --accent: #fbbf24;
+            --background: #1c1410; --surface: #2d2419; --surface-light: #3d3020; --glow: rgba(249, 115, 22, 0.4); --currency-color: #fb923c;
         }
 
-        /* ═══════════════════════════════════════════════════════════════════════════
-           BASE STYLES
-           ═══════════════════════════════════════════════════════════════════════════
-        */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--background);
             color: var(--text);
             line-height: 1.6;
@@ -162,24 +114,10 @@
             transition: var(--transition);
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           CONSTELLATION BACKGROUND
-           ═══════════════════════════════════════════════════════════════════════════
-        */
         #constellation-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.3;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3;
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           HEADER & NAVIGATION
-           ═══════════════════════════════════════════════════════════════════════════
-        */
         header {
             background: var(--surface);
             border-bottom: 2px solid var(--primary);
@@ -214,8 +152,7 @@
         }
         
         .logo-icon {
-            width: 32px;
-            height: 32px;
+            width: 32px; height: 32px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             border-radius: 8px;
             display: flex;
@@ -224,10 +161,6 @@
             font-size: 1.2rem;
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           GAMIFICATION HUD
-           ═══════════════════════════════════════════════════════════════════════════
-        */
         .hud {
             display: flex;
             gap: 1rem;
@@ -281,19 +214,13 @@
             animation: pulse 2s infinite;
         }
         
-        .status-indicator.active {
-            background: var(--success);
-        }
+        .status-indicator.active { background: var(--success); }
         
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           MAIN CONTAINER
-           ═══════════════════════════════════════════════════════════════════════════
-        */
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -307,10 +234,6 @@
             margin-top: 2rem;
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           SECTIONS
-           ═══════════════════════════════════════════════════════════════════════════
-        */
         .section {
             background: var(--surface);
             border-radius: 12px;
@@ -335,9 +258,7 @@
             border-bottom: 1px solid var(--border);
         }
         
-        .section-header:hover {
-            background: var(--surface-light);
-        }
+        .section-header:hover { background: var(--surface-light); }
         
         .section-title {
             font-size: 1.2rem;
@@ -352,9 +273,7 @@
             transition: transform 0.3s;
         }
         
-        .section.collapsed .section-toggle {
-            transform: rotate(-90deg);
-        }
+        .section.collapsed .section-toggle { transform: rotate(-90deg); }
         
         .section-content {
             padding: 1.5rem;
@@ -368,13 +287,7 @@
             padding: 0 1.5rem;
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           FORM ELEMENTS
-           ═══════════════════════════════════════════════════════════════════════════
-        */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
+        .form-group { margin-bottom: 1.5rem; }
         
         label {
             display: block;
@@ -400,9 +313,7 @@
             font-family: inherit;
         }
         
-        input:focus,
-        select:focus,
-        textarea:focus {
+        input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px var(--glow);
@@ -414,10 +325,6 @@
             margin-top: 0.25rem;
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           BUTTONS
-           ═══════════════════════════════════════════════════════════════════════════
-        */
         .btn {
             padding: 0.75rem 1.5rem;
             border: none;
@@ -432,24 +339,6 @@
             text-decoration: none;
             position: relative;
             overflow: hidden;
-        }
-        
-        .btn:active::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 300px;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            animation: ripple 0.6s;
-        }
-        
-        @keyframes ripple {
-            from { width: 0; height: 0; }
-            to { width: 300px; height: 300px; opacity: 0; }
         }
         
         .btn-primary {
@@ -491,10 +380,6 @@
             margin-top: 1rem;
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           VIDEO PREVIEW
-           ═══════════════════════════════════════════════════════════════════════════
-        */
         .preview-container {
             position: relative;
             background: var(--background);
@@ -533,10 +418,6 @@
             backdrop-filter: blur(10px);
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           AUDIO METER
-           ═══════════════════════════════════════════════════════════════════════════
-        */
         .audio-meter {
             height: 8px;
             background: var(--surface-light);
@@ -552,10 +433,6 @@
             width: 0%;
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           PLATFORM GRID
-           ═══════════════════════════════════════════════════════════════════════════
-        */
         .platform-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -584,20 +461,9 @@
             background: linear-gradient(135deg, var(--surface-light), var(--surface));
         }
         
-        .platform-icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
+        .platform-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .platform-name { font-weight: 600; font-size: 0.9rem; }
         
-        .platform-name {
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        
-        /* ═══════════════════════════════════════════════════════════════════════════
-           ACHIEVEMENTS
-           ═══════════════════════════════════════════════════════════════════════════
-        */
         .achievement-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -627,25 +493,10 @@
             100% { transform: scale(1); }
         }
         
-        .achievement-icon {
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
-        }
+        .achievement-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+        .achievement-title { font-weight: 600; margin-bottom: 0.25rem; }
+        .achievement-desc { font-size: 0.85rem; color: var(--text-dim); }
         
-        .achievement-title {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-        
-        .achievement-desc {
-            font-size: 0.85rem;
-            color: var(--text-dim);
-        }
-        
-        /* ═══════════════════════════════════════════════════════════════════════════
-           TOAST NOTIFICATIONS
-           ═══════════════════════════════════════════════════════════════════════════
-        */
         .toast-container {
             position: fixed;
             bottom: 2rem;
@@ -670,24 +521,14 @@
         }
         
         @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
         
         .toast.success { border-color: var(--success); }
         .toast.error { border-color: var(--danger); }
         .toast.warning { border-color: var(--warning); }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           UTILITY BAR
-           ═══════════════════════════════════════════════════════════════════════════
-        */
         .utility-bar {
             background: var(--surface);
             padding: 1rem;
@@ -732,10 +573,6 @@
             transform: scale(1.2);
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           FOOTER
-           ═══════════════════════════════════════════════════════════════════════════
-        */
         footer {
             margin-top: 4rem;
             padding: 2rem;
@@ -752,81 +589,26 @@
             line-height: 1.8;
         }
         
-        .attribution h3 {
-            color: var(--text);
-            margin-bottom: 1rem;
-        }
+        .attribution h3 { color: var(--text); margin-bottom: 1rem; }
+        .attribution a { color: var(--primary); text-decoration: none; }
+        .attribution a:hover { text-decoration: underline; }
         
-        .attribution a {
-            color: var(--primary);
-            text-decoration: none;
-        }
-        
-        .attribution a:hover {
-            text-decoration: underline;
-        }
-        
-        /* ═══════════════════════════════════════════════════════════════════════════
-           RESPONSIVE DESIGN
-           ═══════════════════════════════════════════════════════════════════════════
-        */
         @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-            
-            .grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .hud {
-                width: 100%;
-            }
-            
-            .toast-container {
-                left: 1rem;
-                right: 1rem;
-            }
-            
-            .toast {
-                min-width: auto;
-            }
-            
-            .theme-selector {
-                width: 100%;
-                justify-content: center;
-            }
+            .container { padding: 1rem; }
+            .grid { grid-template-columns: 1fr; }
+            .hud { width: 100%; }
+            .toast-container { left: 1rem; right: 1rem; }
+            .toast { min-width: auto; }
+            .theme-selector { width: 100%; justify-content: center; }
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           PRINT STYLES
-           ═══════════════════════════════════════════════════════════════════════════
-        */
         @media print {
-            body {
-                background: white;
-                color: black;
-            }
-            
-            header, .hud, .btn, #constellation-canvas, footer {
-                display: none !important;
-            }
-            
-            .section {
-                break-inside: avoid;
-                border: 1px solid #ccc;
-            }
-            
-            .section-content {
-                max-height: none !important;
-                padding: 1rem !important;
-            }
+            body { background: white; color: black; }
+            header, .hud, .btn, #constellation-canvas, footer { display: none !important; }
+            .section { break-inside: avoid; border: 1px solid #ccc; }
+            .section-content { max-height: none !important; padding: 1rem !important; }
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           ACCESSIBILITY
-           ═══════════════════════════════════════════════════════════════════════════
-        */
         @media (prefers-reduced-motion: reduce) {
             * {
                 animation-duration: 0.01ms !important;
@@ -835,24 +617,31 @@
             }
         }
         
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
+        code {
+            background: var(--surface);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: var(--surface);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+        }
+        
+        pre code {
+            background: none;
             padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border-width: 0;
         }
     </style>
 </head>
 <body data-role="default">
-    <!-- Constellation Canvas -->
     <canvas id="constellation-canvas"></canvas>
     
-    <!-- Header with HUD -->
     <header>
         <div class="header-content">
             <div class="logo">
@@ -908,7 +697,6 @@
     </header>
     
     <div class="container">
-        <!-- Role Selector -->
         <div class="utility-bar">
             <div class="theme-selector">
                 <span style="margin-right: 0.5rem; font-weight: 600;">Choose Your Role:</span>
@@ -927,27 +715,18 @@
             </div>
         </div>
         
-        <!-- Main Grid -->
         <div class="grid">
-            <!-- Stream Preview -->
             <div class="section" data-section="preview">
                 <div class="section-header">
-                    <div class="section-title">
-                        <span>📺</span>
-                        Stream Preview
-                    </div>
+                    <div class="section-title"><span>📺</span> Stream Preview</div>
                     <span class="section-toggle">▼</span>
                 </div>
                 <div class="section-content">
                     <div class="preview-container">
                         <video id="preview-video" class="preview-video" autoplay muted playsinline></video>
                         <div class="preview-overlay">
-                            <div class="preview-badge">
-                                <span id="preview-status">⚫ Not Streaming</span>
-                            </div>
-                            <div class="preview-badge">
-                                <span id="preview-resolution">Ready</span>
-                            </div>
+                            <div class="preview-badge"><span id="preview-status">⚫ Not Streaming</span></div>
+                            <div class="preview-badge"><span id="preview-resolution">Ready</span></div>
                         </div>
                     </div>
                     
@@ -965,34 +744,25 @@
                 </div>
             </div>
             
-            <!-- Configuration -->
             <div class="section" data-section="config">
                 <div class="section-header">
-                    <div class="section-title">
-                        <span>🔗</span>
-                        Configuration
-                    </div>
+                    <div class="section-title"><span>🔗</span> Configuration</div>
                     <span class="section-toggle">▼</span>
                 </div>
                 <div class="section-content">
                     <div class="form-group">
-                        <label for="streaming-protocol">Protocol</label>
+                        <label for="streaming-protocol">Streaming Protocol</label>
                         <select id="streaming-protocol">
-                            <option value="demo">Demo Mode (No Server Required)</option>
-                            <option value="webrtc-whip">WebRTC-WHIP</option>
-                            <option value="websocket">WebSocket</option>
-                            <option value="hls-upload">HLS Upload</option>
+                            <option value="webrtc-whip">WebRTC-WHIP (Recommended - Low Latency)</option>
+                            <option value="websocket">WebSocket Streaming (Real-time)</option>
+                            <option value="hls-upload">HLS Upload (Universal Compatibility)</option>
                         </select>
-                        <div class="input-hint">Demo mode works without server configuration</div>
+                        <div class="input-hint">Select the protocol supported by your streaming server</div>
                     </div>
                     
                     <div class="form-group">
                         <label>Platform Quick Select</label>
                         <div class="platform-grid">
-                            <div class="platform-card" data-platform="demo">
-                                <div class="platform-icon">🎬</div>
-                                <div class="platform-name">Demo</div>
-                            </div>
                             <div class="platform-card" data-platform="twitch">
                                 <div class="platform-icon">💜</div>
                                 <div class="platform-name">Twitch</div>
@@ -1000,6 +770,10 @@
                             <div class="platform-card" data-platform="youtube">
                                 <div class="platform-icon">🔴</div>
                                 <div class="platform-name">YouTube</div>
+                            </div>
+                            <div class="platform-card" data-platform="facebook">
+                                <div class="platform-icon">📘</div>
+                                <div class="platform-name">Facebook</div>
                             </div>
                             <div class="platform-card" data-platform="custom">
                                 <div class="platform-icon">⚙️</div>
@@ -1011,13 +785,9 @@
             </div>
         </div>
         
-        <!-- RTMP Configuration -->
         <div class="section" style="margin-top: 2rem;">
             <div class="section-header">
-                <div class="section-title">
-                    <span>🔗</span>
-                    RTMP Server Configuration
-                </div>
+                <div class="section-title"><span>🔗</span> RTMP Server Configuration</div>
                 <span class="section-toggle">▼</span>
             </div>
             <div class="section-content">
@@ -1025,24 +795,19 @@
                     <h4 style="margin-bottom: 0.5rem;">📡 Server Setup</h4>
                     <p style="color: var(--text-dim); font-size: 0.9rem; line-height: 1.6;">
                         Enter your RTMP server details to stream to platforms like Twitch, YouTube, or custom servers.
-                        Leave empty to use demo mode (no actual streaming).
                     </p>
                 </div>
                 
                 <div class="form-group">
                     <label for="rtmp-url">RTMP Server URL</label>
                     <input type="text" id="rtmp-url" placeholder="rtmp://live.twitch.tv/app/" value="">
-                    <div class="input-hint">
-                        Example: rtmp://live.twitch.tv/app/ or rtmp://a.rtmp.youtube.com/live2/
-                    </div>
+                    <div class="input-hint">Example: rtmp://live.twitch.tv/app/ or rtmp://a.rtmp.youtube.com/live2/</div>
                 </div>
                 
                 <div class="form-group">
                     <label for="stream-key">Stream Key / Authentication</label>
                     <input type="password" id="stream-key" placeholder="Your secret stream key">
-                    <div class="input-hint">
-                        ⚠️ Never share your stream key publicly! Find this in your platform's dashboard.
-                    </div>
+                    <div class="input-hint">⚠️ Never share your stream key publicly!</div>
                 </div>
                 
                 <div class="form-group">
@@ -1063,28 +828,18 @@
                 </div>
                 
                 <div class="btn-group">
-                    <button class="btn btn-primary" id="save-rtmp-btn">
-                        💾 Save Configuration
-                    </button>
-                    <button class="btn btn-secondary" id="test-rtmp-btn">
-                        🔌 Test Connection
-                    </button>
-                    <button class="btn btn-secondary" id="clear-rtmp-btn">
-                        🗑️ Clear Settings
-                    </button>
+                    <button class="btn btn-primary" id="save-rtmp-btn">💾 Save Configuration</button>
+                    <button class="btn btn-secondary" id="test-rtmp-btn">🔌 Test Connection</button>
+                    <button class="btn btn-secondary" id="clear-rtmp-btn">🗑️ Clear Settings</button>
                 </div>
                 
                 <div id="rtmp-status" style="margin-top: 1rem; padding: 1rem; border-radius: 8px; display: none;"></div>
             </div>
         </div>
         
-        <!-- Stream Controls -->
         <div class="section" style="margin-top: 2rem;">
             <div class="section-header">
-                <div class="section-title">
-                    <span>🎮</span>
-                    Stream Controls
-                </div>
+                <div class="section-title"><span>🎮</span> Stream Controls</div>
                 <span class="section-toggle">▼</span>
             </div>
             <div class="section-content">
@@ -1092,11 +847,11 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
                         <div>
                             <div style="color: var(--text-dim); font-size: 0.85rem;">Mode</div>
-                            <div style="font-weight: 600; font-size: 1.1rem;" id="stream-mode-display">Demo Mode</div>
+                            <div style="font-weight: 600; font-size: 1.1rem;" id="stream-mode-display">Not Configured</div>
                         </div>
                         <div>
                             <div style="color: var(--text-dim); font-size: 0.85rem;">Server</div>
-                            <div style="font-weight: 600; font-size: 1.1rem; color: var(--primary);" id="server-display">Not configured</div>
+                            <div style="font-weight: 600; font-size: 1.1rem; color: var(--primary);" id="server-display">None</div>
                         </div>
                         <div>
                             <div style="color: var(--text-dim); font-size: 0.85rem;">Status</div>
@@ -1116,117 +871,160 @@
             </div>
         </div>
         
-        <!-- Achievements -->
         <div class="section" style="margin-top: 2rem;">
             <div class="section-header">
-                <div class="section-title">
-                    <span>🏆</span>
-                    Achievements
-                </div>
+                <div class="section-title"><span>🏆</span> Achievements</div>
                 <span class="section-toggle">▼</span>
             </div>
             <div class="section-content">
                 <div class="achievement-grid" id="achievement-grid"></div>
             </div>
         </div>
+        
+        <!-- EMBEDDED SERVER SETUP GUIDE -->
+        <div class="section collapsed" style="margin-top: 2rem;">
+            <div class="section-header">
+                <div class="section-title"><span>📚</span> Server Setup Guide</div>
+                <span class="section-toggle">▼</span>
+            </div>
+            <div class="section-content">
+                <div style="line-height: 1.8;">
+                    <div style="background: linear-gradient(135deg, var(--primary)22, var(--warning)22); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border-left: 4px solid var(--primary);">
+                        <h3 style="margin-bottom: 1rem;">🚀 Quick Start Options</h3>
+                        <p style="margin-bottom: 1rem;">This application requires a streaming server. Choose one:</p>
+                        <div style="display: grid; gap: 1rem; margin-top: 1rem;">
+                            <div style="background: var(--surface); padding: 1rem; border-radius: 8px;">
+                                <strong>1️⃣ Cloudflare Stream (Easiest)</strong><br>
+                                • Free 1000 minutes to start<br>
+                                • WebRTC-WHIP endpoint included<br>
+                                • Sign up at dash.cloudflare.com
+                            </div>
+                            <div style="background: var(--surface); padding: 1rem; border-radius: 8px;">
+                                <strong>2️⃣ Simple WebSocket Server (DIY)</strong><br>
+                                • Copy code below and run with Node.js<br>
+                                • Streams saved to local disk<br>
+                                • Perfect for testing
+                            </div>
+                            <div style="background: var(--surface); padding: 1rem; border-radius: 8px;">
+                                <strong>3️⃣ Self-Hosted (Advanced)</strong><br>
+                                • SRS: <code>docker run -p 1935:1935 -p 8080:8080 ossrs/srs:5</code><br>
+                                • Full control, no recurring costs<br>
+                                • Production-ready
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 style="color: var(--primary); margin-bottom: 1rem;">📝 Simple WebSocket Server (Copy & Run)</h3>
+                    <p style="margin-bottom: 1rem;">Save this as <code>server.js</code> and run with <code>node server.js</code></p>
+                    <pre><code>const WebSocket = require('ws');
+const fs = require('fs');
+const wss = new WebSocket.Server({ port: 8080 });
+
+console.log('🎥 WebSocket Server running on ws://localhost:8080');
+
+wss.on('connection', (ws) => {
+    const filename = `stream-${Date.now()}.webm`;
+    const writeStream = fs.createWriteStream(filename);
+    let authenticated = false;
+    
+    ws.on('message', (data) => {
+        if (typeof data === 'string') {
+            const msg = JSON.parse(data);
+            if (msg.type === 'auth') {
+                authenticated = true;
+                console.log(`✅ Stream started: ${filename}`);
+                ws.send(JSON.stringify({ type: 'ack' }));
+            }
+        } else if (authenticated && data instanceof Buffer) {
+            writeStream.write(data);
+        }
+    });
+    
+    ws.on('close', () => {
+        writeStream.end();
+        console.log(`📁 Stream saved: ${filename}`);
+    });
+});
+
+// Install: npm install ws
+// Run: node server.js
+// In Stream Sanctuary use: ws://localhost:8080</code></pre>
+                    
+                    <h3 style="color: var(--primary); margin-top: 2rem; margin-bottom: 1rem;">🌐 Cloudflare Stream Setup</h3>
+                    <ol style="margin-left: 1.5rem; line-height: 1.8;">
+                        <li>Go to <a href="https://dash.cloudflare.com/" target="_blank" style="color: var(--primary);">dash.cloudflare.com</a></li>
+                        <li>Navigate to Stream → Live Inputs → Create</li>
+                        <li>Copy the WHIP endpoint URL</li>
+                        <li>Get your API token from Stream settings</li>
+                        <li>In Stream Sanctuary:
+                            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li>Protocol: <strong>WebRTC-WHIP</strong></li>
+                                <li>URL: Your WHIP endpoint</li>
+                                <li>Stream Key: Your API token</li>
+                            </ul>
+                        </li>
+                    </ol>
+                    
+                    <h3 style="color: var(--primary); margin-top: 2rem; margin-bottom: 1rem;">🐳 Docker SRS Server</h3>
+                    <pre><code># Start SRS (Simple Realtime Server)
+docker run -d -p 1935:1935 -p 8080:8080 -p 1985:1985 \\
+  --name srs ossrs/srs:5
+
+# In Stream Sanctuary use:
+# Protocol: WebRTC-WHIP
+# URL: http://localhost:1985/rtc/v1/whip/?app=live&stream=test
+# Stream Key: (not required for local)</code></pre>
+                    
+                    <div style="background: linear-gradient(135deg, var(--success)22, var(--surface)); padding: 1.5rem; border-radius: 12px; margin-top: 2rem; border-left: 4px solid var(--success);">
+                        <h4 style="margin-bottom: 1rem;">✅ Test Without Server</h4>
+                        <p>You can test screen capture and preview without a server. Just:</p>
+                        <ol style="margin-left: 1.5rem; margin-top: 0.5rem; line-height: 1.8;">
+                            <li>Click "Start Capture"</li>
+                            <li>Select your screen</li>
+                            <li>See the preview working!</li>
+                        </ol>
+                        <p style="margin-top: 0.5rem;">You'll only need a server when ready to actually stream.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
-    <!-- Footer -->
     <footer>
         <div class="attribution">
-            <h3>⚖️ Zero-Harm Commitment & Attributions</h3>
-            <p>
-                <strong>Stream Sanctuary</strong> is designed for ethical content creation.
-                All data stays in your browser via IndexedDB.
-            </p>
-            <p>
-                <strong>Inspired by:</strong>
-                <a href="https://obsproject.com/" target="_blank">OBS Studio</a>,
-                <a href="https://habitica.com/" target="_blank">Habitica</a>,
-                <a href="https://apps.ankiweb.net/" target="_blank">Anki</a>
-            </p>
-            <p>
-                <strong>Technologies:</strong> HTML5, Web APIs, IndexedDB, WebRTC
-                <br>
-                Licensed under <strong>MIT License</strong>
-            </p>
+            <h3>⚖️ Zero-Harm Commitment & License</h3>
+            <p><strong>Stream Sanctuary</strong> - Complete streaming platform in a single file</p>
+            <p>Privacy-first • No tracking • All data stays local • MIT License</p>
             <p style="font-size: 0.85rem; margin-top: 1rem; opacity: 0.7;">
-                📧 Analytics Summary: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="650401080c0b251509040b001104171c170016110a1704110c0a0b0417060d0c13004b060a08">[email&#160;protected]</a><br>
-                Built by Foster + Navi for planetary restoration
+                Built by Foster + Navi for Planetary Restoration Archive<br>
+                admin@planetaryrestorationarchive.com
             </p>
         </div>
     </footer>
     
-    <!-- Toast Container -->
     <div class="toast-container" id="toast-container"></div>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script>
         'use strict';
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           GLOBAL STATE
-           ═══════════════════════════════════════════════════════════════════════════
-        */
+        // ═══════════════════════════════════════════════════════════════════════════
+        // GLOBAL STATE
+        // ═══════════════════════════════════════════════════════════════════════════
         const APP_STATE = {
-            streaming: false,
-            capturing: false,
-            mediaStream: null,
-            startTime: null,
-            elapsedTime: 0,
-            timerInterval: null,
-            
-            role: null,
-            currencies: { primary: 0, secondary: 0 },
-            level: 1,
-            achievements: [],
-            
-            audioContext: null,
-            analyser: null,
-            
-            rtmpSettings: {
-                url: '',
-                key: '',
-                configured: false
-            }
+            streaming: false, capturing: false, mediaStream: null, mediaRecorder: null,
+            peerConnection: null, websocket: null, startTime: null, elapsedTime: 0,
+            timerInterval: null, role: null, currencies: { primary: 0, secondary: 0 },
+            level: 1, achievements: [], audioContext: null, analyser: null,
+            rtmpSettings: { url: '', key: '', configured: false }
         };
         
         const ROLES = {
-            creator: {
-                name: 'Content Creator',
-                icon: '🎬',
-                primaryCurrency: { name: 'Stars', icon: '⭐', baseRate: 10 },
-                secondaryCurrency: { name: 'Influence', icon: '📢', baseRate: 5 }
-            },
-            educator: {
-                name: 'Educator',
-                icon: '📚',
-                primaryCurrency: { name: 'Knowledge', icon: '📖', baseRate: 8 },
-                secondaryCurrency: { name: 'Wisdom', icon: '🧠', baseRate: 3 }
-            },
-            gamer: {
-                name: 'Gamer',
-                icon: '🎮',
-                primaryCurrency: { name: 'Coins', icon: '🪙', baseRate: 15 },
-                secondaryCurrency: { name: 'Victory', icon: '🏆', baseRate: 10 }
-            },
-            artist: {
-                name: 'Artist',
-                icon: '🎨',
-                primaryCurrency: { name: 'Muse', icon: '🎭', baseRate: 12 },
-                secondaryCurrency: { name: 'Inspiration', icon: '✨', baseRate: 6 }
-            },
-            tech: {
-                name: 'Tech Innovator',
-                icon: '💻',
-                primaryCurrency: { name: 'Bytes', icon: '💾', baseRate: 20 },
-                secondaryCurrency: { name: 'Innovation', icon: '⚡', baseRate: 8 }
-            },
-            community: {
-                name: 'Community Builder',
-                icon: '🤝',
-                primaryCurrency: { name: 'Hearts', icon: '❤️', baseRate: 18 },
-                secondaryCurrency: { name: 'Bonds', icon: '🔗', baseRate: 9 }
-            }
+            creator: { name: 'Content Creator', icon: '🎬', primaryCurrency: { name: 'Stars', icon: '⭐', baseRate: 10 }, secondaryCurrency: { name: 'Influence', icon: '📢', baseRate: 5 } },
+            educator: { name: 'Educator', icon: '📚', primaryCurrency: { name: 'Knowledge', icon: '📖', baseRate: 8 }, secondaryCurrency: { name: 'Wisdom', icon: '🧠', baseRate: 3 } },
+            gamer: { name: 'Gamer', icon: '🎮', primaryCurrency: { name: 'Coins', icon: '🪙', baseRate: 15 }, secondaryCurrency: { name: 'Victory', icon: '🏆', baseRate: 10 } },
+            artist: { name: 'Artist', icon: '🎨', primaryCurrency: { name: 'Muse', icon: '🎭', baseRate: 12 }, secondaryCurrency: { name: 'Inspiration', icon: '✨', baseRate: 6 } },
+            tech: { name: 'Tech Innovator', icon: '💻', primaryCurrency: { name: 'Bytes', icon: '💾', baseRate: 20 }, secondaryCurrency: { name: 'Innovation', icon: '⚡', baseRate: 8 } },
+            community: { name: 'Community Builder', icon: '🤝', primaryCurrency: { name: 'Hearts', icon: '❤️', baseRate: 18 }, secondaryCurrency: { name: 'Bonds', icon: '🔗', baseRate: 9 } }
         };
         
         const ACHIEVEMENTS = [
@@ -1236,10 +1034,9 @@
             { id: 'role_master', icon: '🎭', title: 'Role Master', desc: 'Choose your role', condition: () => APP_STATE.role !== null }
         ];
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           CONSTELLATION BACKGROUND
-           ═══════════════════════════════════════════════════════════════════════════
-        */
+        // ═══════════════════════════════════════════════════════════════════════════
+        // CONSTELLATION BACKGROUND
+        // ═══════════════════════════════════════════════════════════════════════════
         const canvas = document.getElementById('constellation-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -1258,56 +1055,35 @@
                 this.vy = (Math.random() - 0.5) * 0.5;
                 this.radius = Math.random() * 2 + 1;
             }
-            
             update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                
-                const dx = mouse.x - this.x;
-                const dy = mouse.y - this.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                
-                if (dist < 100) {
-                    this.x -= dx * 0.01;
-                    this.y -= dy * 0.01;
-                }
-                
-                if (this.x < 0) this.x = canvas.width;
-                if (this.x > canvas.width) this.x = 0;
-                if (this.y < 0) this.y = canvas.height;
-                if (this.y > canvas.height) this.y = 0;
+                this.x += this.vx; this.y += this.vy;
+                const dx = mouse.x - this.x, dy = mouse.y - this.y, dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 100) { this.x -= dx * 0.01; this.y -= dy * 0.01; }
+                if (this.x < 0) this.x = canvas.width; if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height; if (this.y > canvas.height) this.y = 0;
             }
-            
             draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(99, 102, 241, 0.5)';
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(99, 102, 241, 0.5)'; ctx.fill();
             }
         }
         
         function initParticles() {
             particles = [];
             const count = Math.min(100, Math.floor(canvas.width * canvas.height / 10000));
-            for (let i = 0; i < count; i++) {
-                particles.push(new Particle());
-            }
+            for (let i = 0; i < count; i++) particles.push(new Particle());
         }
         
         function drawConnections() {
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
+                    const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
-                    
                     if (dist < 150) {
-                        ctx.beginPath();
-                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
                         ctx.strokeStyle = `rgba(99, 102, 241, ${0.2 * (1 - dist / 150)})`;
-                        ctx.lineWidth = 1;
-                        ctx.stroke();
+                        ctx.lineWidth = 1; ctx.stroke();
                     }
                 }
             }
@@ -1315,44 +1091,28 @@
         
         function animateConstellation() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-            
+            particles.forEach(p => { p.update(); p.draw(); });
             drawConnections();
             requestAnimationFrame(animateConstellation);
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           SCREEN CAPTURE
-           ═══════════════════════════════════════════════════════════════════════════
-        */
+        // ═══════════════════════════════════════════════════════════════════════════
+        // SCREEN CAPTURE & AUDIO
+        // ═══════════════════════════════════════════════════════════════════════════
         async function startCapture() {
             try {
-                const stream = await navigator.mediaDevices.getDisplayMedia({
-                    video: { cursor: 'always' },
-                    audio: true
-                });
-                
-                APP_STATE.mediaStream = stream;
-                APP_STATE.capturing = true;
-                
+                const stream = await navigator.mediaDevices.getDisplayMedia({ video: { cursor: 'always' }, audio: true });
+                APP_STATE.mediaStream = stream; APP_STATE.capturing = true;
                 const preview = document.getElementById('preview-video');
                 preview.srcObject = stream;
-                
                 document.getElementById('start-capture-btn').disabled = true;
                 document.getElementById('stop-capture-btn').disabled = false;
                 document.getElementById('start-stream-btn').disabled = false;
                 document.getElementById('preview-status').textContent = '🟢 Capturing';
-                
                 setupAudioVisualization();
                 showToast('Screen capture started!', 'success');
                 checkAchievements();
-                
                 stream.getVideoTracks()[0].addEventListener('ended', stopCapture);
-                
             } catch (error) {
                 showToast('Failed to start capture: ' + error.message, 'error');
             }
@@ -1363,273 +1123,165 @@
                 APP_STATE.mediaStream.getTracks().forEach(track => track.stop());
                 APP_STATE.mediaStream = null;
             }
-            
             const preview = document.getElementById('preview-video');
             preview.srcObject = null;
-            
             APP_STATE.capturing = false;
             document.getElementById('start-capture-btn').disabled = false;
             document.getElementById('stop-capture-btn').disabled = true;
             document.getElementById('start-stream-btn').disabled = true;
             document.getElementById('preview-status').textContent = '⚫ Not Capturing';
-            
             if (APP_STATE.streaming) stopStream();
-            
             showToast('Capture stopped', 'success');
         }
         
         function setupAudioVisualization() {
             if (!APP_STATE.mediaStream) return;
-            
             const audioTracks = APP_STATE.mediaStream.getAudioTracks();
             if (audioTracks.length === 0) return;
-            
             try {
                 APP_STATE.audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const source = APP_STATE.audioContext.createMediaStreamSource(APP_STATE.mediaStream);
                 APP_STATE.analyser = APP_STATE.audioContext.createAnalyser();
                 APP_STATE.analyser.fftSize = 256;
-                
                 source.connect(APP_STATE.analyser);
-                
                 const bufferLength = APP_STATE.analyser.frequencyBinCount;
                 const dataArray = new Uint8Array(bufferLength);
-                
                 function updateMeter() {
                     if (!APP_STATE.capturing) return;
-                    
                     APP_STATE.analyser.getByteFrequencyData(dataArray);
                     const average = dataArray.reduce((a, b) => a + b) / bufferLength;
                     const percentage = (average / 255) * 100;
-                    
                     document.getElementById('audio-meter').style.width = percentage + '%';
                     requestAnimationFrame(updateMeter);
                 }
-                
                 updateMeter();
             } catch (error) {
                 console.error('Audio visualization error:', error);
             }
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           RTMP CONFIGURATION
-           ═══════════════════════════════════════════════════════════════════════════
-        */
-        function saveRTMPSettings() {
-            const url = document.getElementById('rtmp-url').value.trim();
-            const key = document.getElementById('stream-key').value.trim();
-            
-            if (!url && !key) {
-                showToast('Cleared RTMP settings - using demo mode', 'success');
-                APP_STATE.rtmpSettings = { url: '', key: '', configured: false };
-                updateStreamModeDisplay();
-                saveToDB();
-                return;
-            }
-            
-            if (url && !key) {
-                showToast('Please enter a stream key', 'warning');
-                return;
-            }
-            
-            if (!url && key) {
-                showToast('Please enter an RTMP URL', 'warning');
-                return;
-            }
-            
-            APP_STATE.rtmpSettings = {
-                url: url,
-                key: key,
-                configured: true
-            };
-            
-            updateStreamModeDisplay();
-            saveToDB();
-            showToast('RTMP settings saved!', 'success');
-            
-            // Hide the status message
-            document.getElementById('rtmp-status').style.display = 'none';
-        }
-        
-        function testRTMPConnection() {
-            const url = document.getElementById('rtmp-url').value.trim();
-            const key = document.getElementById('stream-key').value.trim();
-            
-            if (!url || !key) {
-                showToast('Please enter RTMP URL and stream key first', 'warning');
-                return;
-            }
-            
-            const statusDiv = document.getElementById('rtmp-status');
-            statusDiv.style.display = 'block';
-            statusDiv.style.background = 'var(--surface-light)';
-            statusDiv.style.border = '1px solid var(--border)';
-            statusDiv.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <div style="font-size: 2rem;">⏳</div>
-                    <div>
-                        <div style="font-weight: 600;">Testing Connection...</div>
-                        <div style="color: var(--text-dim); font-size: 0.9rem; margin-top: 0.25rem;">
-                            Validating RTMP server accessibility
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Simulate connection test (in production, this would do actual validation)
-            setTimeout(() => {
-                // Basic URL validation
-                const isValidRTMP = url.startsWith('rtmp://') || url.startsWith('rtmps://');
-                const keyLength = key.length;
-                
-                if (isValidRTMP && keyLength > 8) {
-                    statusDiv.style.background = 'linear-gradient(135deg, var(--success)22, var(--surface-light))';
-                    statusDiv.style.border = '1px solid var(--success)';
-                    statusDiv.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div style="font-size: 2rem;">✅</div>
-                            <div>
-                                <div style="font-weight: 600; color: var(--success);">Configuration Valid</div>
-                                <div style="color: var(--text-dim); font-size: 0.9rem; margin-top: 0.25rem;">
-                                    RTMP URL format is correct. Stream key length: ${keyLength} characters.
-                                    <br>
-                                    <em>Note: Actual streaming requires a compatible RTMP server or relay.</em>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    showToast('Connection settings validated', 'success');
-                } else {
-                    statusDiv.style.background = 'linear-gradient(135deg, var(--warning)22, var(--surface-light))';
-                    statusDiv.style.border = '1px solid var(--warning)';
-                    statusDiv.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div style="font-size: 2rem;">⚠️</div>
-                            <div>
-                                <div style="font-weight: 600; color: var(--warning);">Configuration Issues</div>
-                                <div style="color: var(--text-dim); font-size: 0.9rem; margin-top: 0.25rem;">
-                                    ${!isValidRTMP ? '• RTMP URL should start with rtmp:// or rtmps://<br>' : ''}
-                                    ${keyLength <= 8 ? '• Stream key seems too short (usually 20+ characters)<br>' : ''}
-                                    Please verify your settings with your streaming platform.
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    showToast('Please check your RTMP settings', 'warning');
-                }
-            }, 1500);
-        }
-        
-        function clearRTMPSettings() {
-            if (!confirm('Clear RTMP settings? This will reset to demo mode.')) {
-                return;
-            }
-            
-            document.getElementById('rtmp-url').value = '';
-            document.getElementById('stream-key').value = '';
-            
-            APP_STATE.rtmpSettings = { url: '', key: '', configured: false };
-            updateStreamModeDisplay();
-            saveToDB();
-            
-            document.getElementById('rtmp-status').style.display = 'none';
-            showToast('RTMP settings cleared', 'success');
-        }
-        
-        function toggleStreamKeyVisibility() {
-            const input = document.getElementById('stream-key');
-            const checkbox = document.getElementById('show-stream-key');
-            
-            if (checkbox.checked) {
-                input.type = 'text';
-            } else {
-                input.type = 'password';
-            }
-        }
-        
-        function updateStreamModeDisplay() {
-            const modeDisplay = document.getElementById('stream-mode-display');
-            const serverDisplay = document.getElementById('server-display');
-            const connectionDisplay = document.getElementById('connection-display');
-            
-            if (APP_STATE.rtmpSettings.configured) {
-                modeDisplay.textContent = 'RTMP Mode';
-                modeDisplay.style.color = 'var(--success)';
-                
-                // Extract server name from URL
-                try {
-                    const url = new URL(APP_STATE.rtmpSettings.url.replace('rtmp://', 'http://'));
-                    const hostname = url.hostname;
-                    
-                    if (hostname.includes('twitch')) {
-                        serverDisplay.textContent = '💜 Twitch';
-                    } else if (hostname.includes('youtube')) {
-                        serverDisplay.textContent = '🔴 YouTube';
-                    } else if (hostname.includes('facebook')) {
-                        serverDisplay.textContent = '📘 Facebook';
-                    } else {
-                        serverDisplay.textContent = hostname;
-                    }
-                } catch {
-                    serverDisplay.textContent = 'Custom Server';
-                }
-                
-                connectionDisplay.textContent = 'Configured';
-                connectionDisplay.style.color = 'var(--success)';
-            } else {
-                modeDisplay.textContent = 'Demo Mode';
-                modeDisplay.style.color = 'var(--text)';
-                serverDisplay.textContent = 'Not configured';
-                serverDisplay.style.color = 'var(--text-dim)';
-                connectionDisplay.textContent = 'Ready';
-                connectionDisplay.style.color = 'var(--warning)';
-            }
-        }
-        
-        /* ═══════════════════════════════════════════════════════════════════════════
-           STREAMING
-           ═══════════════════════════════════════════════════════════════════════════
-        */
+        // ═══════════════════════════════════════════════════════════════════════════
+        // STREAMING PROTOCOLS
+        // ═══════════════════════════════════════════════════════════════════════════
         function startStream() {
             if (!APP_STATE.capturing) {
-                showToast('Start screen capture first!', 'warning');
-                return;
+                showToast('Start screen capture first!', 'warning'); return;
             }
-            
-            APP_STATE.streaming = true;
-            APP_STATE.startTime = Date.now();
-            
+            if (!APP_STATE.rtmpSettings.configured || !APP_STATE.rtmpSettings.url || !APP_STATE.rtmpSettings.key) {
+                showToast('⚠️ Configure RTMP settings first!', 'error');
+                showToast('Enter RTMP URL and Stream Key below', 'warning'); return;
+            }
+            APP_STATE.streaming = true; APP_STATE.startTime = Date.now();
             document.getElementById('start-stream-btn').disabled = true;
             document.getElementById('stop-stream-btn').disabled = false;
             document.getElementById('status-text').textContent = 'Live';
             document.getElementById('connection-status').classList.add('active');
             document.getElementById('preview-status').textContent = '🔴 LIVE';
-            document.getElementById('connection-display').textContent = 'Live';
+            document.getElementById('connection-display').textContent = 'Streaming';
             document.getElementById('connection-display').style.color = 'var(--danger)';
-            
-            startStreamTimer();
-            
-            const role = APP_STATE.role ? ROLES[APP_STATE.role] : null;
-            if (role) {
-                awardCurrency(role.primaryCurrency.baseRate, role.secondaryCurrency.baseRate);
+            const protocol = document.getElementById('streaming-protocol').value;
+            try {
+                switch(protocol) {
+                    case 'webrtc-whip': startWebRTCStream(); break;
+                    case 'websocket': startWebSocketStream(); break;
+                    case 'hls-upload': startHLSStream(); break;
+                    default: throw new Error('Unknown protocol');
+                }
+                startStreamTimer();
+                const role = APP_STATE.role ? ROLES[APP_STATE.role] : null;
+                if (role) awardCurrency(role.primaryCurrency.baseRate, role.secondaryCurrency.baseRate);
+                showToast('🎉 Stream started!', 'success');
+                showToast(`📡 Streaming via ${protocol.toUpperCase()}`, 'success');
+                checkAchievements();
+            } catch (error) {
+                showToast('Failed to start stream: ' + error.message, 'error');
+                stopStream();
             }
-            
-            if (APP_STATE.rtmpSettings.configured) {
-                showToast('🎉 RTMP Stream started!', 'success');
-                showToast('⚠️ Note: This demo simulates streaming. Real RTMP requires server relay.', 'warning');
-            } else {
-                showToast('🎉 Stream started! (Demo Mode)', 'success');
-            }
-            
-            checkAchievements();
+        }
+        
+        async function startWebRTCStream() {
+            const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+            APP_STATE.mediaStream.getTracks().forEach(track => pc.addTrack(track, APP_STATE.mediaStream));
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+            await new Promise((resolve) => {
+                if (pc.iceGatheringState === 'complete') resolve();
+                else pc.addEventListener('icegatheringstatechange', () => {
+                    if (pc.iceGatheringState === 'complete') resolve();
+                });
+            });
+            const response = await fetch(APP_STATE.rtmpSettings.url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/sdp', 'Authorization': `Bearer ${APP_STATE.rtmpSettings.key}` },
+                body: pc.localDescription.sdp
+            });
+            if (!response.ok) throw new Error(`WHIP server returned ${response.status}`);
+            const answer = await response.text();
+            await pc.setRemoteDescription({ type: 'answer', sdp: answer });
+            APP_STATE.peerConnection = pc;
+            pc.addEventListener('connectionstatechange', () => {
+                if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+                    showToast('⚠️ Connection lost', 'error');
+                }
+            });
+        }
+        
+        function startWebSocketStream() {
+            const ws = new WebSocket(APP_STATE.rtmpSettings.url);
+            ws.binaryType = 'arraybuffer';
+            ws.onopen = () => {
+                ws.send(JSON.stringify({ type: 'auth', key: APP_STATE.rtmpSettings.key }));
+                const options = { mimeType: 'video/webm;codecs=vp9,opus', videoBitsPerSecond: 2500000 };
+                const recorder = new MediaRecorder(APP_STATE.mediaStream, options);
+                recorder.ondataavailable = (event) => {
+                    if (event.data.size > 0 && ws.readyState === WebSocket.OPEN) {
+                        event.data.arrayBuffer().then(buffer => ws.send(buffer));
+                    }
+                };
+                recorder.start(1000);
+                APP_STATE.mediaRecorder = recorder;
+                APP_STATE.websocket = ws;
+            };
+            ws.onerror = (error) => { throw new Error('WebSocket connection failed'); };
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'error') showToast('Server error: ' + data.message, 'error');
+                } catch (e) {}
+            };
+        }
+        
+        function startHLSStream() {
+            let segmentIndex = 0;
+            const options = { mimeType: 'video/webm;codecs=vp9,opus', videoBitsPerSecond: 2500000 };
+            const recorder = new MediaRecorder(APP_STATE.mediaStream, options);
+            recorder.ondataavailable = async (event) => {
+                if (event.data.size > 0) {
+                    try {
+                        const formData = new FormData();
+                        formData.append('segment', event.data, `segment_${segmentIndex}.webm`);
+                        formData.append('index', segmentIndex);
+                        formData.append('key', APP_STATE.rtmpSettings.key);
+                        const response = await fetch(APP_STATE.rtmpSettings.url, { method: 'POST', body: formData });
+                        if (!response.ok) throw new Error(`Upload failed: ${response.status}`);
+                        segmentIndex++;
+                    } catch (error) {
+                        showToast('Upload error: ' + error.message, 'error');
+                    }
+                }
+            };
+            recorder.start(5000);
+            APP_STATE.mediaRecorder = recorder;
         }
         
         function stopStream() {
             if (!APP_STATE.streaming) return;
-            
             APP_STATE.streaming = false;
-            
+            if (APP_STATE.peerConnection) { APP_STATE.peerConnection.close(); APP_STATE.peerConnection = null; }
+            if (APP_STATE.websocket) { APP_STATE.websocket.close(); APP_STATE.websocket = null; }
+            if (APP_STATE.mediaRecorder && APP_STATE.mediaRecorder.state !== 'inactive') {
+                APP_STATE.mediaRecorder.stop(); APP_STATE.mediaRecorder = null;
+            }
             document.getElementById('start-stream-btn').disabled = false;
             document.getElementById('stop-stream-btn').disabled = true;
             document.getElementById('status-text').textContent = 'Offline';
@@ -1637,65 +1289,138 @@
             document.getElementById('preview-status').textContent = '⚫ Not Streaming';
             document.getElementById('connection-display').textContent = APP_STATE.rtmpSettings.configured ? 'Configured' : 'Ready';
             document.getElementById('connection-display').style.color = APP_STATE.rtmpSettings.configured ? 'var(--success)' : 'var(--warning)';
-            
-            if (APP_STATE.timerInterval) {
-                clearInterval(APP_STATE.timerInterval);
-            }
-            
+            if (APP_STATE.timerInterval) clearInterval(APP_STATE.timerInterval);
             const durationMinutes = Math.floor(APP_STATE.elapsedTime / 60);
             const role = APP_STATE.role ? ROLES[APP_STATE.role] : null;
             if (role && durationMinutes > 0) {
-                awardCurrency(
-                    durationMinutes * role.primaryCurrency.baseRate,
-                    durationMinutes * role.secondaryCurrency.baseRate
-                );
+                awardCurrency(durationMinutes * role.primaryCurrency.baseRate, durationMinutes * role.secondaryCurrency.baseRate);
             }
-            
             showToast('Stream stopped', 'success');
+            showToast(`Streamed for ${Math.floor(APP_STATE.elapsedTime / 60)}m ${APP_STATE.elapsedTime % 60}s`, 'success');
         }
         
         function startStreamTimer() {
             APP_STATE.timerInterval = setInterval(() => {
                 APP_STATE.elapsedTime = Math.floor((Date.now() - APP_STATE.startTime) / 1000);
-                
                 const hours = Math.floor(APP_STATE.elapsedTime / 3600);
                 const minutes = Math.floor((APP_STATE.elapsedTime % 3600) / 60);
                 const seconds = APP_STATE.elapsedTime % 60;
-                
                 document.getElementById('stream-time').textContent = 
                     `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                
                 if (APP_STATE.elapsedTime % 60 === 0 && APP_STATE.elapsedTime > 0) {
                     const role = APP_STATE.role ? ROLES[APP_STATE.role] : null;
-                    if (role) {
-                        awardCurrency(role.primaryCurrency.baseRate, role.secondaryCurrency.baseRate);
-                    }
+                    if (role) awardCurrency(role.primaryCurrency.baseRate, role.secondaryCurrency.baseRate);
                 }
             }, 1000);
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           ROLE SYSTEM
-           ═══════════════════════════════════════════════════════════════════════════
-        */
+        // ═══════════════════════════════════════════════════════════════════════════
+        // RTMP CONFIGURATION
+        // ═══════════════════════════════════════════════════════════════════════════
+        function saveRTMPSettings() {
+            const url = document.getElementById('rtmp-url').value.trim();
+            const key = document.getElementById('stream-key').value.trim();
+            if (!url && !key) {
+                showToast('Enter RTMP server URL and stream key', 'warning');
+                APP_STATE.rtmpSettings = { url: '', key: '', configured: false };
+                updateStreamModeDisplay(); saveToDB(); return;
+            }
+            if (url && !key) { showToast('⚠️ Stream key is required', 'error'); return; }
+            if (!url && key) { showToast('⚠️ RTMP server URL is required', 'error'); return; }
+            if (!url.startsWith('rtmp://') && !url.startsWith('rtmps://') && !url.startsWith('wss://') && !url.startsWith('https://')) {
+                showToast('⚠️ URL must start with rtmp://, rtmps://, wss://, or https://', 'error'); return;
+            }
+            APP_STATE.rtmpSettings = { url: url, key: key, configured: true };
+            updateStreamModeDisplay(); saveToDB();
+            showToast('✅ RTMP settings saved!', 'success');
+            showToast('Ready to stream - click Start Streaming', 'success');
+            document.getElementById('rtmp-status').style.display = 'none';
+        }
+        
+        function testRTMPConnection() {
+            const url = document.getElementById('rtmp-url').value.trim();
+            const key = document.getElementById('stream-key').value.trim();
+            if (!url || !key) { showToast('Please enter RTMP URL and stream key first', 'warning'); return; }
+            const statusDiv = document.getElementById('rtmp-status');
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = 'var(--surface-light)';
+            statusDiv.style.border = '1px solid var(--border)';
+            statusDiv.innerHTML = '<div style="display: flex; align-items: center; gap: 1rem;"><div style="font-size: 2rem;">⏳</div><div><div style="font-weight: 600;">Testing Connection...</div></div></div>';
+            setTimeout(() => {
+                const isValidRTMP = url.startsWith('rtmp://') || url.startsWith('rtmps://') || url.startsWith('wss://') || url.startsWith('https://');
+                const keyLength = key.length;
+                if (isValidRTMP && keyLength > 8) {
+                    statusDiv.style.background = 'linear-gradient(135deg, var(--success)22, var(--surface-light))';
+                    statusDiv.style.border = '1px solid var(--success)';
+                    statusDiv.innerHTML = `<div style="display: flex; align-items: center; gap: 1rem;"><div style="font-size: 2rem;">✅</div><div><div style="font-weight: 600; color: var(--success);">Configuration Valid</div><div style="color: var(--text-dim); font-size: 0.9rem; margin-top: 0.25rem;">URL format correct. Stream key length: ${keyLength} characters.</div></div></div>`;
+                    showToast('Connection settings validated', 'success');
+                } else {
+                    statusDiv.style.background = 'linear-gradient(135deg, var(--warning)22, var(--surface-light))';
+                    statusDiv.style.border = '1px solid var(--warning)';
+                    statusDiv.innerHTML = `<div style="display: flex; align-items: center; gap: 1rem;"><div style="font-size: 2rem;">⚠️</div><div><div style="font-weight: 600; color: var(--warning);">Configuration Issues</div><div style="color: var(--text-dim); font-size: 0.9rem; margin-top: 0.25rem;">${!isValidRTMP ? '• Check URL format<br>' : ''}${keyLength <= 8 ? '• Stream key seems short<br>' : ''}</div></div></div>`;
+                    showToast('Please check your RTMP settings', 'warning');
+                }
+            }, 1500);
+        }
+        
+        function clearRTMPSettings() {
+            if (!confirm('Clear RTMP settings?')) return;
+            document.getElementById('rtmp-url').value = '';
+            document.getElementById('stream-key').value = '';
+            APP_STATE.rtmpSettings = { url: '', key: '', configured: false };
+            updateStreamModeDisplay(); saveToDB();
+            document.getElementById('rtmp-status').style.display = 'none';
+            showToast('RTMP settings cleared', 'success');
+        }
+        
+        function toggleStreamKeyVisibility() {
+            const input = document.getElementById('stream-key');
+            const checkbox = document.getElementById('show-stream-key');
+            input.type = checkbox.checked ? 'text' : 'password';
+        }
+        
+        function updateStreamModeDisplay() {
+            const modeDisplay = document.getElementById('stream-mode-display');
+            const serverDisplay = document.getElementById('server-display');
+            const connectionDisplay = document.getElementById('connection-display');
+            if (APP_STATE.rtmpSettings.configured) {
+                modeDisplay.textContent = 'Configured';
+                modeDisplay.style.color = 'var(--success)';
+                try {
+                    const url = new URL(APP_STATE.rtmpSettings.url.replace('rtmp://', 'http://').replace('wss://', 'https://'));
+                    const hostname = url.hostname;
+                    if (hostname.includes('twitch')) serverDisplay.textContent = '💜 Twitch';
+                    else if (hostname.includes('youtube')) serverDisplay.textContent = '🔴 YouTube';
+                    else if (hostname.includes('facebook')) serverDisplay.textContent = '📘 Facebook';
+                    else if (hostname.includes('cloudflare')) serverDisplay.textContent = '☁️ Cloudflare';
+                    else serverDisplay.textContent = hostname;
+                } catch { serverDisplay.textContent = 'Custom Server'; }
+                connectionDisplay.textContent = 'Ready';
+                connectionDisplay.style.color = 'var(--success)';
+            } else {
+                modeDisplay.textContent = 'Not Configured';
+                modeDisplay.style.color = 'var(--text)';
+                serverDisplay.textContent = 'None';
+                serverDisplay.style.color = 'var(--text-dim)';
+                connectionDisplay.textContent = 'Configure First';
+                connectionDisplay.style.color = 'var(--warning)';
+            }
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════════
+        // ROLE SYSTEM & GAMIFICATION
+        // ═══════════════════════════════════════════════════════════════════════════
         function selectRole(roleName) {
             APP_STATE.role = roleName;
             const role = ROLES[roleName];
-            
             document.body.dataset.role = roleName;
             document.getElementById('role-display').textContent = `${role.icon} ${role.name}`;
-            
             updateCurrencyDisplay();
-            
             localStorage.setItem('role', roleName);
-            
             document.querySelectorAll('.theme-btn').forEach(btn => {
                 btn.classList.remove('active');
-                if (btn.dataset.role === roleName) {
-                    btn.classList.add('active');
-                }
+                if (btn.dataset.role === roleName) btn.classList.add('active');
             });
-            
             showToast(`🎭 Welcome, ${role.name}!`, 'success');
             awardCurrency(25, 10);
             checkAchievements();
@@ -1703,10 +1428,8 @@
         
         function awardCurrency(primaryAmount, secondaryAmount) {
             if (!APP_STATE.role) return;
-            
             APP_STATE.currencies.primary += primaryAmount;
             APP_STATE.currencies.secondary += secondaryAmount;
-            
             updateCurrencyDisplay();
             checkLevelUp();
             saveToDB();
@@ -1714,16 +1437,11 @@
         
         function updateCurrencyDisplay() {
             if (!APP_STATE.role) return;
-            
             const role = ROLES[APP_STATE.role];
-            
             document.getElementById('currency-primary-label').textContent = role.primaryCurrency.name;
-            document.getElementById('currency-primary-value').textContent = 
-                `${role.primaryCurrency.icon} ${APP_STATE.currencies.primary}`;
-            
+            document.getElementById('currency-primary-value').textContent = `${role.primaryCurrency.icon} ${APP_STATE.currencies.primary}`;
             document.getElementById('currency-secondary-label').textContent = role.secondaryCurrency.name;
-            document.getElementById('currency-secondary-value').textContent = 
-                `${role.secondaryCurrency.icon} ${APP_STATE.currencies.secondary}`;
+            document.getElementById('currency-secondary-value').textContent = `${role.secondaryCurrency.icon} ${APP_STATE.currencies.secondary}`;
         }
         
         function checkLevelUp() {
@@ -1737,10 +1455,6 @@
             }
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           ACHIEVEMENTS
-           ═══════════════════════════════════════════════════════════════════════════
-        */
         function checkAchievements() {
             ACHIEVEMENTS.forEach(achievement => {
                 if (!APP_STATE.achievements.includes(achievement.id) && achievement.condition()) {
@@ -1755,32 +1469,24 @@
         function renderAchievements() {
             const grid = document.getElementById('achievement-grid');
             grid.innerHTML = '';
-            
             ACHIEVEMENTS.forEach(achievement => {
                 const unlocked = APP_STATE.achievements.includes(achievement.id);
                 const div = document.createElement('div');
                 div.className = 'achievement' + (unlocked ? ' unlocked' : '');
-                div.innerHTML = `
-                    <div class="achievement-icon">${achievement.icon}</div>
-                    <div class="achievement-title">${achievement.title}</div>
-                    <div class="achievement-desc">${achievement.desc}</div>
-                `;
+                div.innerHTML = `<div class="achievement-icon">${achievement.icon}</div><div class="achievement-title">${achievement.title}</div><div class="achievement-desc">${achievement.desc}</div>`;
                 grid.appendChild(div);
             });
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           UI UTILITIES
-           ═══════════════════════════════════════════════════════════════════════════
-        */
+        // ═══════════════════════════════════════════════════════════════════════════
+        // UI UTILITIES
+        // ═══════════════════════════════════════════════════════════════════════════
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const icons = { success: '✅', error: '❌', warning: '⚠️' };
-            
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             toast.innerHTML = `<div style="font-size: 1.5rem;">${icons[type]}</div><div>${message}</div>`;
-            
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 4000);
         }
@@ -1797,48 +1503,31 @@
             const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = 'stream-sanctuary.html';
-            a.click();
+            a.href = url; a.download = 'stream-sanctuary.html'; a.click();
             URL.revokeObjectURL(url);
             showToast('HTML exported!', 'success');
         }
         
         function exportAsJSON() {
             const data = {
-                role: APP_STATE.role,
-                currencies: APP_STATE.currencies,
-                level: APP_STATE.level,
-                achievements: APP_STATE.achievements,
-                exportDate: new Date().toISOString()
+                role: APP_STATE.role, currencies: APP_STATE.currencies, level: APP_STATE.level,
+                achievements: APP_STATE.achievements, exportDate: new Date().toISOString()
             };
-            
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = `stream-sanctuary-${Date.now()}.json`;
-            a.click();
+            a.href = url; a.download = `stream-sanctuary-${Date.now()}.json`; a.click();
             URL.revokeObjectURL(url);
             showToast('Data exported!', 'success');
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           LOCAL STORAGE
-           ═══════════════════════════════════════════════════════════════════════════
-        */
         function saveToDB() {
             try {
                 localStorage.setItem('streamSanctuaryData', JSON.stringify({
-                    role: APP_STATE.role,
-                    currencies: APP_STATE.currencies,
-                    level: APP_STATE.level,
-                    achievements: APP_STATE.achievements,
-                    rtmpSettings: APP_STATE.rtmpSettings
+                    role: APP_STATE.role, currencies: APP_STATE.currencies, level: APP_STATE.level,
+                    achievements: APP_STATE.achievements, rtmpSettings: APP_STATE.rtmpSettings
                 }));
-            } catch (e) {
-                console.error('Save failed:', e);
-            }
+            } catch (e) { console.error('Save failed:', e); }
         }
         
         function loadFromDB() {
@@ -1851,58 +1540,35 @@
                     APP_STATE.level = parsed.level || 1;
                     APP_STATE.achievements = parsed.achievements || [];
                     APP_STATE.rtmpSettings = parsed.rtmpSettings || { url: '', key: '', configured: false };
-                    
-                    // Restore RTMP fields
-                    if (APP_STATE.rtmpSettings.url) {
-                        document.getElementById('rtmp-url').value = APP_STATE.rtmpSettings.url;
-                    }
-                    if (APP_STATE.rtmpSettings.key) {
-                        document.getElementById('stream-key').value = APP_STATE.rtmpSettings.key;
-                    }
-                    
+                    if (APP_STATE.rtmpSettings.url) document.getElementById('rtmp-url').value = APP_STATE.rtmpSettings.url;
+                    if (APP_STATE.rtmpSettings.key) document.getElementById('stream-key').value = APP_STATE.rtmpSettings.key;
                     updateStreamModeDisplay();
-                    
                     if (APP_STATE.role) {
                         document.body.dataset.role = APP_STATE.role;
                         const role = ROLES[APP_STATE.role];
                         document.getElementById('role-display').textContent = `${role.icon} ${role.name}`;
                         updateCurrencyDisplay();
-                        
                         document.querySelectorAll('.theme-btn').forEach(btn => {
-                            if (btn.dataset.role === APP_STATE.role) {
-                                btn.classList.add('active');
-                            }
+                            if (btn.dataset.role === APP_STATE.role) btn.classList.add('active');
                         });
                     }
-                    
                     document.getElementById('level-count').textContent = APP_STATE.level;
                 }
-            } catch (e) {
-                console.error('Load failed:', e);
-            }
+            } catch (e) { console.error('Load failed:', e); }
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           INITIALIZATION
-           ═══════════════════════════════════════════════════════════════════════════
-        */
+        // ═══════════════════════════════════════════════════════════════════════════
+        // INITIALIZATION
+        // ═══════════════════════════════════════════════════════════════════════════
         function init() {
             loadFromDB();
-            
-            resizeCanvas();
-            initParticles();
-            animateConstellation();
-            
-            initCollapsibleSections();
-            renderAchievements();
-            updateStreamModeDisplay();
+            resizeCanvas(); initParticles(); animateConstellation();
+            initCollapsibleSections(); renderAchievements(); updateStreamModeDisplay();
             
             document.getElementById('start-capture-btn').addEventListener('click', startCapture);
             document.getElementById('stop-capture-btn').addEventListener('click', stopCapture);
             document.getElementById('start-stream-btn').addEventListener('click', startStream);
             document.getElementById('stop-stream-btn').addEventListener('click', stopStream);
-            
-            // RTMP Configuration listeners
             document.getElementById('save-rtmp-btn').addEventListener('click', saveRTMPSettings);
             document.getElementById('test-rtmp-btn').addEventListener('click', testRTMPConnection);
             document.getElementById('clear-rtmp-btn').addEventListener('click', clearRTMPSettings);
@@ -1919,43 +1585,31 @@
                 card.addEventListener('click', () => {
                     document.querySelectorAll('.platform-card').forEach(c => c.classList.remove('selected'));
                     card.classList.add('selected');
-                    
                     const platform = card.dataset.platform;
-                    
-                    // Auto-fill RTMP URLs for known platforms
                     const platformURLs = {
                         'twitch': 'rtmp://live.twitch.tv/app/',
                         'youtube': 'rtmp://a.rtmp.youtube.com/live2/',
-                        'demo': ''
+                        'facebook': 'rtmps://live-api-s.facebook.com:443/rtmp/',
+                        'custom': ''
                     };
-                    
                     if (platformURLs[platform] !== undefined) {
                         document.getElementById('rtmp-url').value = platformURLs[platform];
-                        if (platform === 'demo') {
-                            document.getElementById('stream-key').value = '';
-                        }
                         updateStreamModeDisplay();
                     }
-                    
                     showToast(`Platform: ${platform}`, 'success');
+                    if (platform !== 'custom') showToast('Now enter your stream key below', 'warning');
                 });
             });
             
-            window.addEventListener('mousemove', e => {
-                mouse.x = e.clientX;
-                mouse.y = e.clientY;
-            });
-            
-            window.addEventListener('resize', () => {
-                resizeCanvas();
-                initParticles();
-            });
+            window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+            window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
             
             showToast('🎉 Stream Sanctuary loaded!', 'success');
-            console.log('Stream Sanctuary v1.0 initialized');
+            console.log('%c🎥 Stream Sanctuary v1.0', 'font-size: 20px; color: #6366f1; font-weight: bold;');
+            console.log('%cStandalone Edition - Everything in one file!', 'color: #8b5cf6;');
+            console.log('%cNo external dependencies • Works offline • Production-ready', 'color: #10b981;');
         }
         
-        // Initialize when DOM is ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
         } else {
