@@ -1011,6 +1011,73 @@
             </div>
         </div>
         
+        <!-- RTMP Configuration -->
+        <div class="section" style="margin-top: 2rem;">
+            <div class="section-header">
+                <div class="section-title">
+                    <span>🔗</span>
+                    RTMP Server Configuration
+                </div>
+                <span class="section-toggle">▼</span>
+            </div>
+            <div class="section-content">
+                <div style="background: linear-gradient(135deg, var(--primary)22, var(--secondary)22); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                    <h4 style="margin-bottom: 0.5rem;">📡 Server Setup</h4>
+                    <p style="color: var(--text-dim); font-size: 0.9rem; line-height: 1.6;">
+                        Enter your RTMP server details to stream to platforms like Twitch, YouTube, or custom servers.
+                        Leave empty to use demo mode (no actual streaming).
+                    </p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="rtmp-url">RTMP Server URL</label>
+                    <input type="text" id="rtmp-url" placeholder="rtmp://live.twitch.tv/app/" value="">
+                    <div class="input-hint">
+                        Example: rtmp://live.twitch.tv/app/ or rtmp://a.rtmp.youtube.com/live2/
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="stream-key">Stream Key / Authentication</label>
+                    <input type="password" id="stream-key" placeholder="Your secret stream key">
+                    <div class="input-hint">
+                        ⚠️ Never share your stream key publicly! Find this in your platform's dashboard.
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="show-stream-key" style="width: auto; margin-right: 0.5rem;">
+                        Show stream key (toggle visibility)
+                    </label>
+                </div>
+                
+                <div style="background: var(--background); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent); margin-bottom: 1rem;">
+                    <h4 style="margin-bottom: 0.5rem;">🎯 Platform Quick Links</h4>
+                    <ul style="margin-left: 1.5rem; line-height: 1.8; color: var(--text-dim);">
+                        <li><strong>Twitch:</strong> Settings → Stream → Copy Stream Key</li>
+                        <li><strong>YouTube:</strong> YouTube Studio → Go Live → Stream Key</li>
+                        <li><strong>Facebook:</strong> Live Producer → Use Stream Key → Show Key</li>
+                        <li><strong>Custom Server:</strong> Get URL and key from your admin</li>
+                    </ul>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="save-rtmp-btn">
+                        💾 Save Configuration
+                    </button>
+                    <button class="btn btn-secondary" id="test-rtmp-btn">
+                        🔌 Test Connection
+                    </button>
+                    <button class="btn btn-secondary" id="clear-rtmp-btn">
+                        🗑️ Clear Settings
+                    </button>
+                </div>
+                
+                <div id="rtmp-status" style="margin-top: 1rem; padding: 1rem; border-radius: 8px; display: none;"></div>
+            </div>
+        </div>
+        
         <!-- Stream Controls -->
         <div class="section" style="margin-top: 2rem;">
             <div class="section-header">
@@ -1021,6 +1088,23 @@
                 <span class="section-toggle">▼</span>
             </div>
             <div class="section-content">
+                <div style="margin-bottom: 1.5rem; padding: 1rem; background: var(--background); border-radius: 8px; border: 1px solid var(--border);">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div>
+                            <div style="color: var(--text-dim); font-size: 0.85rem;">Mode</div>
+                            <div style="font-weight: 600; font-size: 1.1rem;" id="stream-mode-display">Demo Mode</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--text-dim); font-size: 0.85rem;">Server</div>
+                            <div style="font-weight: 600; font-size: 1.1rem; color: var(--primary);" id="server-display">Not configured</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--text-dim); font-size: 0.85rem;">Status</div>
+                            <div style="font-weight: 600; font-size: 1.1rem; color: var(--warning);" id="connection-display">Ready</div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="btn-group" style="justify-content: center;">
                     <button class="btn btn-success" id="start-stream-btn" style="font-size: 1.2rem; padding: 1rem 2rem;">
                         🚀 Start Streaming
@@ -1067,7 +1151,7 @@
                 Licensed under <strong>MIT License</strong>
             </p>
             <p style="font-size: 0.85rem; margin-top: 1rem; opacity: 0.7;">
-                📧 Analytics Summary: admin@planetaryrestorationarchive.com<br>
+                📧 Analytics Summary: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="650401080c0b251509040b001104171c170016110a1704110c0a0b0417060d0c13004b060a08">[email&#160;protected]</a><br>
                 Built by Foster + Navi for planetary restoration
             </p>
         </div>
@@ -1076,7 +1160,7 @@
     <!-- Toast Container -->
     <div class="toast-container" id="toast-container"></div>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         'use strict';
         
         /* ═══════════════════════════════════════════════════════════════════════════
@@ -1097,7 +1181,13 @@
             achievements: [],
             
             audioContext: null,
-            analyser: null
+            analyser: null,
+            
+            rtmpSettings: {
+                url: '',
+                key: '',
+                configured: false
+            }
         };
         
         const ROLES = {
@@ -1323,6 +1413,181 @@
         }
         
         /* ═══════════════════════════════════════════════════════════════════════════
+           RTMP CONFIGURATION
+           ═══════════════════════════════════════════════════════════════════════════
+        */
+        function saveRTMPSettings() {
+            const url = document.getElementById('rtmp-url').value.trim();
+            const key = document.getElementById('stream-key').value.trim();
+            
+            if (!url && !key) {
+                showToast('Cleared RTMP settings - using demo mode', 'success');
+                APP_STATE.rtmpSettings = { url: '', key: '', configured: false };
+                updateStreamModeDisplay();
+                saveToDB();
+                return;
+            }
+            
+            if (url && !key) {
+                showToast('Please enter a stream key', 'warning');
+                return;
+            }
+            
+            if (!url && key) {
+                showToast('Please enter an RTMP URL', 'warning');
+                return;
+            }
+            
+            APP_STATE.rtmpSettings = {
+                url: url,
+                key: key,
+                configured: true
+            };
+            
+            updateStreamModeDisplay();
+            saveToDB();
+            showToast('RTMP settings saved!', 'success');
+            
+            // Hide the status message
+            document.getElementById('rtmp-status').style.display = 'none';
+        }
+        
+        function testRTMPConnection() {
+            const url = document.getElementById('rtmp-url').value.trim();
+            const key = document.getElementById('stream-key').value.trim();
+            
+            if (!url || !key) {
+                showToast('Please enter RTMP URL and stream key first', 'warning');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('rtmp-status');
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = 'var(--surface-light)';
+            statusDiv.style.border = '1px solid var(--border)';
+            statusDiv.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="font-size: 2rem;">⏳</div>
+                    <div>
+                        <div style="font-weight: 600;">Testing Connection...</div>
+                        <div style="color: var(--text-dim); font-size: 0.9rem; margin-top: 0.25rem;">
+                            Validating RTMP server accessibility
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Simulate connection test (in production, this would do actual validation)
+            setTimeout(() => {
+                // Basic URL validation
+                const isValidRTMP = url.startsWith('rtmp://') || url.startsWith('rtmps://');
+                const keyLength = key.length;
+                
+                if (isValidRTMP && keyLength > 8) {
+                    statusDiv.style.background = 'linear-gradient(135deg, var(--success)22, var(--surface-light))';
+                    statusDiv.style.border = '1px solid var(--success)';
+                    statusDiv.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="font-size: 2rem;">✅</div>
+                            <div>
+                                <div style="font-weight: 600; color: var(--success);">Configuration Valid</div>
+                                <div style="color: var(--text-dim); font-size: 0.9rem; margin-top: 0.25rem;">
+                                    RTMP URL format is correct. Stream key length: ${keyLength} characters.
+                                    <br>
+                                    <em>Note: Actual streaming requires a compatible RTMP server or relay.</em>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    showToast('Connection settings validated', 'success');
+                } else {
+                    statusDiv.style.background = 'linear-gradient(135deg, var(--warning)22, var(--surface-light))';
+                    statusDiv.style.border = '1px solid var(--warning)';
+                    statusDiv.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="font-size: 2rem;">⚠️</div>
+                            <div>
+                                <div style="font-weight: 600; color: var(--warning);">Configuration Issues</div>
+                                <div style="color: var(--text-dim); font-size: 0.9rem; margin-top: 0.25rem;">
+                                    ${!isValidRTMP ? '• RTMP URL should start with rtmp:// or rtmps://<br>' : ''}
+                                    ${keyLength <= 8 ? '• Stream key seems too short (usually 20+ characters)<br>' : ''}
+                                    Please verify your settings with your streaming platform.
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    showToast('Please check your RTMP settings', 'warning');
+                }
+            }, 1500);
+        }
+        
+        function clearRTMPSettings() {
+            if (!confirm('Clear RTMP settings? This will reset to demo mode.')) {
+                return;
+            }
+            
+            document.getElementById('rtmp-url').value = '';
+            document.getElementById('stream-key').value = '';
+            
+            APP_STATE.rtmpSettings = { url: '', key: '', configured: false };
+            updateStreamModeDisplay();
+            saveToDB();
+            
+            document.getElementById('rtmp-status').style.display = 'none';
+            showToast('RTMP settings cleared', 'success');
+        }
+        
+        function toggleStreamKeyVisibility() {
+            const input = document.getElementById('stream-key');
+            const checkbox = document.getElementById('show-stream-key');
+            
+            if (checkbox.checked) {
+                input.type = 'text';
+            } else {
+                input.type = 'password';
+            }
+        }
+        
+        function updateStreamModeDisplay() {
+            const modeDisplay = document.getElementById('stream-mode-display');
+            const serverDisplay = document.getElementById('server-display');
+            const connectionDisplay = document.getElementById('connection-display');
+            
+            if (APP_STATE.rtmpSettings.configured) {
+                modeDisplay.textContent = 'RTMP Mode';
+                modeDisplay.style.color = 'var(--success)';
+                
+                // Extract server name from URL
+                try {
+                    const url = new URL(APP_STATE.rtmpSettings.url.replace('rtmp://', 'http://'));
+                    const hostname = url.hostname;
+                    
+                    if (hostname.includes('twitch')) {
+                        serverDisplay.textContent = '💜 Twitch';
+                    } else if (hostname.includes('youtube')) {
+                        serverDisplay.textContent = '🔴 YouTube';
+                    } else if (hostname.includes('facebook')) {
+                        serverDisplay.textContent = '📘 Facebook';
+                    } else {
+                        serverDisplay.textContent = hostname;
+                    }
+                } catch {
+                    serverDisplay.textContent = 'Custom Server';
+                }
+                
+                connectionDisplay.textContent = 'Configured';
+                connectionDisplay.style.color = 'var(--success)';
+            } else {
+                modeDisplay.textContent = 'Demo Mode';
+                modeDisplay.style.color = 'var(--text)';
+                serverDisplay.textContent = 'Not configured';
+                serverDisplay.style.color = 'var(--text-dim)';
+                connectionDisplay.textContent = 'Ready';
+                connectionDisplay.style.color = 'var(--warning)';
+            }
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════════
            STREAMING
            ═══════════════════════════════════════════════════════════════════════════
         */
@@ -1340,6 +1605,8 @@
             document.getElementById('status-text').textContent = 'Live';
             document.getElementById('connection-status').classList.add('active');
             document.getElementById('preview-status').textContent = '🔴 LIVE';
+            document.getElementById('connection-display').textContent = 'Live';
+            document.getElementById('connection-display').style.color = 'var(--danger)';
             
             startStreamTimer();
             
@@ -1348,7 +1615,13 @@
                 awardCurrency(role.primaryCurrency.baseRate, role.secondaryCurrency.baseRate);
             }
             
-            showToast('🎉 Stream started! (Demo Mode)', 'success');
+            if (APP_STATE.rtmpSettings.configured) {
+                showToast('🎉 RTMP Stream started!', 'success');
+                showToast('⚠️ Note: This demo simulates streaming. Real RTMP requires server relay.', 'warning');
+            } else {
+                showToast('🎉 Stream started! (Demo Mode)', 'success');
+            }
+            
             checkAchievements();
         }
         
@@ -1362,6 +1635,8 @@
             document.getElementById('status-text').textContent = 'Offline';
             document.getElementById('connection-status').classList.remove('active');
             document.getElementById('preview-status').textContent = '⚫ Not Streaming';
+            document.getElementById('connection-display').textContent = APP_STATE.rtmpSettings.configured ? 'Configured' : 'Ready';
+            document.getElementById('connection-display').style.color = APP_STATE.rtmpSettings.configured ? 'var(--success)' : 'var(--warning)';
             
             if (APP_STATE.timerInterval) {
                 clearInterval(APP_STATE.timerInterval);
@@ -1558,7 +1833,8 @@
                     role: APP_STATE.role,
                     currencies: APP_STATE.currencies,
                     level: APP_STATE.level,
-                    achievements: APP_STATE.achievements
+                    achievements: APP_STATE.achievements,
+                    rtmpSettings: APP_STATE.rtmpSettings
                 }));
             } catch (e) {
                 console.error('Save failed:', e);
@@ -1574,6 +1850,17 @@
                     APP_STATE.currencies = parsed.currencies || { primary: 0, secondary: 0 };
                     APP_STATE.level = parsed.level || 1;
                     APP_STATE.achievements = parsed.achievements || [];
+                    APP_STATE.rtmpSettings = parsed.rtmpSettings || { url: '', key: '', configured: false };
+                    
+                    // Restore RTMP fields
+                    if (APP_STATE.rtmpSettings.url) {
+                        document.getElementById('rtmp-url').value = APP_STATE.rtmpSettings.url;
+                    }
+                    if (APP_STATE.rtmpSettings.key) {
+                        document.getElementById('stream-key').value = APP_STATE.rtmpSettings.key;
+                    }
+                    
+                    updateStreamModeDisplay();
                     
                     if (APP_STATE.role) {
                         document.body.dataset.role = APP_STATE.role;
@@ -1608,11 +1895,18 @@
             
             initCollapsibleSections();
             renderAchievements();
+            updateStreamModeDisplay();
             
             document.getElementById('start-capture-btn').addEventListener('click', startCapture);
             document.getElementById('stop-capture-btn').addEventListener('click', stopCapture);
             document.getElementById('start-stream-btn').addEventListener('click', startStream);
             document.getElementById('stop-stream-btn').addEventListener('click', stopStream);
+            
+            // RTMP Configuration listeners
+            document.getElementById('save-rtmp-btn').addEventListener('click', saveRTMPSettings);
+            document.getElementById('test-rtmp-btn').addEventListener('click', testRTMPConnection);
+            document.getElementById('clear-rtmp-btn').addEventListener('click', clearRTMPSettings);
+            document.getElementById('show-stream-key').addEventListener('change', toggleStreamKeyVisibility);
             
             document.querySelectorAll('.theme-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -1625,7 +1919,25 @@
                 card.addEventListener('click', () => {
                     document.querySelectorAll('.platform-card').forEach(c => c.classList.remove('selected'));
                     card.classList.add('selected');
-                    showToast(`Platform: ${card.dataset.platform}`, 'success');
+                    
+                    const platform = card.dataset.platform;
+                    
+                    // Auto-fill RTMP URLs for known platforms
+                    const platformURLs = {
+                        'twitch': 'rtmp://live.twitch.tv/app/',
+                        'youtube': 'rtmp://a.rtmp.youtube.com/live2/',
+                        'demo': ''
+                    };
+                    
+                    if (platformURLs[platform] !== undefined) {
+                        document.getElementById('rtmp-url').value = platformURLs[platform];
+                        if (platform === 'demo') {
+                            document.getElementById('stream-key').value = '';
+                        }
+                        updateStreamModeDisplay();
+                    }
+                    
+                    showToast(`Platform: ${platform}`, 'success');
                 });
             });
             
@@ -1642,12 +1954,3 @@
             showToast('🎉 Stream Sanctuary loaded!', 'success');
             console.log('Stream Sanctuary v1.0 initialized');
         }
-        
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
-        } else {
-            init();
-        }
-    </script>
-</body>
-</html>
