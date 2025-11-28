@@ -1954,3 +1954,13 @@
             showToast('🎉 Stream Sanctuary loaded!', 'success');
             console.log('Stream Sanctuary v1.0 initialized');
         }
+        
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
